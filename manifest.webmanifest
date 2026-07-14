@@ -1,1 +1,1 @@
-{"name":"GPT-Live","short_name":"GPT-Live","description":"实时 AI 协作工作台","start_url":"./","display":"standalone","background_color":"#f3f0e8","theme_color":"#0b1215","icons":[{"src":"assets/favicon.svg","sizes":"any","type":"image/svg+xml"}]}
+{"name":"GPT Live Voice AI","short_name":"GPT Live","description":"Independent GPT Live voice AI interface and guide","start_url":"./","display":"standalone","background_color":"#05080a","theme_color":"#05080a","lang":"en","icons":[{"src":"assets/favicon.svg","sizes":"any","type":"image/svg+xml"}]}

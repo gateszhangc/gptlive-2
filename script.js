@@ -1,8 +1,32 @@
-const scenes={meeting:{m:[["林","产品","用户不是找不到功能，而是不知道第一步该做什么。"],["周","设计","首页不应该继续加入口，应该先给一个明确路径。"],["AI","GPT-Live","检测到共识：问题是首次使用路径，而不是功能数量。"]],i:[["DECISION","首页只保留一个主行动"],["OPEN QUESTION","新用户完成第一步的判断标准是什么？"],["NEXT","今天验证两版首次使用路径"]]},research:{m:[["陈","研究","三份报告的数据口径不一样，不能直接比较增长率。"],["苏","分析","先统一时间范围，再看绝对量和结构变化。"],["AI","GPT-Live","检测到口径冲突：时间范围、样本定义。"]],i:[["FACT","3 份来源使用不同统计区间"],["RISK","直接比较会放大增长差异"],["NEXT","建立统一口径后重新计算"]]},build:{m:[["赵","工程","接口本身正常，超时只发生在批量请求。"],["何","工程","日志显示连接池在第 40 秒耗尽。"],["AI","GPT-Live","当前最可能原因：批量并发超过连接池容量。"]],i:[["SIGNAL","单请求稳定，批量请求超时"],["HYPOTHESIS","连接未及时释放"],["NEXT","复现 20/50/100 并发并记录池状态"]]}}
-function render(k){const d=scenes[k];document.querySelector("#messages").innerHTML=d.m.map(x=>`<div class="msg"><span>${x[0]}</span><div><b>${x[1]}</b><p>${x[2]}</p></div></div>`).join("");document.querySelector("#insights").innerHTML=d.i.map(x=>`<div class="insight"><span>${x[0]}</span><p>${x[1]}</p></div>`).join("")}render("meeting");
-document.querySelectorAll(".scene").forEach(b=>b.onclick=()=>{document.querySelectorAll(".scene").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.scene)});
-document.querySelector("#advance").onclick=e=>{e.currentTarget.textContent="下一步已生成 ✓";setTimeout(()=>e.currentTarget.textContent="生成下一步 →",1600)};
-const sd={team:["01 / TEAM","让会议结束时，事情已经向前走了。","实时区分背景信息、明确决定和开放问题。不让关键分歧被一句“会后再看”掩盖。",["同步形成会议简报","识别未达成一致的部分","生成负责人明确的行动项"],"“最好的会议纪要，不是复述发生了什么，而是让所有人知道接下来做什么。”"],creator:["02 / CREATOR","把一闪而过的想法，推进成完整表达。","从语音、资料和临时笔记中识别核心观点，保留你的判断，而不是生成没有立场的通用文章。",["提炼一句话核心观点","标记证据与表达缺口","组织结构和下一步素材"],"“内容不是生成出来的字数，而是被说清楚的判断。”"],dev:["03 / BUILD","让排障围绕证据，而不是猜测。","把日志、代码线索和团队讨论放进同一上下文，区分事实与假设，持续更新验证顺序。",["连接日志与讨论线索","维护可验证的原因假设","生成按优先级排列的测试动作"],"“复杂问题不可怕，可怕的是同时验证十个未经记录的猜测。”"],research:["04 / RESEARCH","让资料越多，结论反而越清楚。","跨来源对齐概念、时间与证据强度，看清真正的共识、冲突和缺失。",["对齐来源口径与定义","区分事实、观点与推断","维护尚未回答的问题"],"“研究的价值不在于读了多少，而在于知道哪些结论现在还不能下。”"]};
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");const d=sd[b.dataset.tab];["#s-index","#s-title","#s-copy","#s-quote"].forEach((x,i)=>document.querySelector(x).textContent=d[i]);document.querySelector("#s-list").innerHTML=d[3].map(x=>`<li>${x}</li>`).join("")});
-const ob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");ob.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll(".reveal").forEach(x=>ob.observe(x));
-const menu=document.querySelector(".menu"),mobile=document.querySelector(".mobile-nav");menu.onclick=()=>{const open=mobile.classList.toggle("open");menu.setAttribute("aria-expanded",open)};mobile.querySelectorAll("a").forEach(a=>a.onclick=()=>mobile.classList.remove("open"));document.querySelector("#year").textContent=new Date().getFullYear();
+const samples={
+  English:["I want to practice explaining a product idea clearly.","Let’s work through it. Start with the problem your product solves and who experiences it most often."],
+  "Simplified Chinese":["我想练习清楚地介绍一个产品想法。","我们可以从产品解决的问题，以及最常遇到这个问题的人群开始。"],
+  Japanese:["プロダクトのアイデアを明確に説明する練習がしたいです。","まず、そのプロダクトが解決する問題と、誰がその問題を抱えているかを整理しましょう。"],
+  Spanish:["Quiero practicar cómo explicar una idea de producto.","Empecemos por el problema que resuelve y por las personas que lo experimentan."],
+  French:["Je veux apprendre à présenter clairement une idée de produit.","Commençons par le problème résolu et les personnes qui le rencontrent."]
+};
+const button=document.querySelector("#demo-button");
+button.addEventListener("click",()=>{
+  window.location.href="https://saylive.lat/";
+});
+document.querySelector("#language").addEventListener("change",()=>{button.innerHTML="<span>♩</span> Start interface demo";document.querySelector("#voice-text").textContent="Waiting for speech...";document.querySelector("#response-text").textContent="Your live response will appear here."});
+const cases={
+  practice:["01 / PRACTICE","Practice a language with natural back-and-forth.","Interrupt, ask for a slower explanation, or pause to find a word. Spoken answers and visible text help you hear and review the same response.","> use_case: language practice<br>> interaction: full duplex<br>> response: voice + text<br>> status: ready"],
+  ideas:["02 / IDEAS","Think out loud without waiting for rigid turns.","Explore an early idea conversationally. GPT Live can keep listening through pauses and delegate deeper questions without ending the exchange.","> use_case: idea development<br>> pauses: respected<br>> deeper_work: delegated<br>> status: active"],
+  access:["03 / ACCESS","Get hands-free help while staying in context.","Use voice for everyday questions, planning, or moments when typing is inconvenient. Add text or images to the same chat when supported.","> use_case: hands-free help<br>> input: voice + context<br>> output: spoken + visual<br>> status: ready"],
+  review:["04 / TRANSLATE","Move between languages in real time.","Use continuous conversation for language practice or live translation, while keeping important answers visible for review.","> use_case: live translation<br>> conversation: continuous<br>> transcript: reviewable<br>> status: ready"]
+};
+document.querySelectorAll(".case-tab").forEach(tab=>tab.addEventListener("click",()=>{
+  document.querySelectorAll(".case-tab").forEach(item=>item.classList.remove("active"));
+  tab.classList.add("active");
+  const data=cases[tab.dataset.case];
+  ["#case-index","#case-title","#case-copy","#case-log"].forEach((id,index)=>document.querySelector(id).innerHTML=data[index]);
+}));
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target)}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(element=>observer.observe(element));
+const menu=document.querySelector(".menu-toggle");
+const mobileNav=document.querySelector(".mobile-nav");
+menu.addEventListener("click",()=>{const open=mobileNav.classList.toggle("open");menu.setAttribute("aria-expanded",String(open))});
+mobileNav.querySelectorAll("a").forEach(link=>link.addEventListener("click",()=>{mobileNav.classList.remove("open");menu.setAttribute("aria-expanded","false")}));
+window.addEventListener("scroll",()=>document.querySelector(".site-header").classList.toggle("scrolled",window.scrollY>20),{passive:true});
+document.querySelector("#year").textContent=new Date().getFullYear();

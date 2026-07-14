@@ -1,6 +1,6 @@
 # GPT-Live
 
-Pure static GPT-Live marketing site built with HTML, CSS and JavaScript.
+Static English landing page for the GPT-Live real-time voice AI interface, built with HTML, CSS, and JavaScript.
 
 ## Preview
 

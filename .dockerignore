@@ -3,3 +3,6 @@
 .gitignore
 CNAME
 README.md
+.env
+.env.*
+.secrets
